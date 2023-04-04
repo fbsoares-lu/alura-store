@@ -5,6 +5,39 @@ import (
 	"alura-store/models"
 )
 
+func FindOne(id int) models.Product {
+	db := db.Connection()
+
+	product, err := db.Query("select * from alura.products where alura.products.id=$1", id)
+
+	if err != nil {
+		panic(err.Error())
+	}
+
+	productForUpdate := models.Product{}
+
+	for product.Next() {
+		var id, quantity int
+		var name, description string
+		var price float64
+
+		err = product.Scan(&id, &name, &description, &price, &quantity)
+
+		if err != nil {
+			panic(err.Error())
+		}
+
+		productForUpdate.Id = id
+		productForUpdate.Name = name
+		productForUpdate.Description = description
+		productForUpdate.Price = price
+		productForUpdate.Quantity = quantity
+	}
+
+	defer db.Close()
+	return productForUpdate
+}
+
 func FindAll() []models.Product {
 	db := db.Connection()
 
@@ -61,6 +94,20 @@ func Delete(productId int) {
 	}
 
 	product.Exec(productId)
+
+	defer db.Close()
+}
+
+func Update(id int, name string, description string, price float64, quantity int) {
+	db := db.Connection()
+
+	updatedProduct, err := db.Prepare("update alura.products set name=$1, description=$2, price=$3, quantity=$4 where id=$5")
+
+	if err != nil {
+		panic(err.Error())
+	}
+
+	updatedProduct.Exec(name, description, price, quantity, id)
 
 	defer db.Close()
 }
