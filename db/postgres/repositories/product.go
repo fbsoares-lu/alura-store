@@ -39,3 +39,15 @@ func FindAll() []models.Product {
 	defer db.Close()
 	return products
 }
+
+func Insert(name, description string, price float64, quantity int) {
+	db := db.Connection()
+	insertProduct, err := db.Prepare("insert into alura.products(name, description, price, quantity) values($1, $2, $3, $4)")
+
+	if err != nil {
+		panic(err.Error())
+	}
+
+	insertProduct.Exec(name, description, price, quantity)
+	defer db.Close()
+}
