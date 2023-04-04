@@ -40,3 +40,16 @@ func Insert(w http.ResponseWriter, r *http.Request) {
 	}
 	http.Redirect(w, r, "/", 301)
 }
+
+func Delete(w http.ResponseWriter, r *http.Request) {
+	productId := r.URL.Query().Get("id")
+
+	productIdFormatted, err := strconv.Atoi(productId)
+
+	if err != nil {
+		log.Println("Error when format the product id", err)
+	}
+
+	repositories.Delete(productIdFormatted)
+	http.Redirect(w, r, "/", 301)
+}

@@ -51,3 +51,16 @@ func Insert(name, description string, price float64, quantity int) {
 	insertProduct.Exec(name, description, price, quantity)
 	defer db.Close()
 }
+
+func Delete(productId int) {
+	db := db.Connection()
+	product, err := db.Prepare("delete from alura.products where alura.products.id = $1")
+
+	if err != nil {
+		panic(err.Error())
+	}
+
+	product.Exec(productId)
+
+	defer db.Close()
+}
